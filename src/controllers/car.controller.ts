@@ -26,10 +26,33 @@ interface CarInterface {
 
 export const getCars = async (req: Request, res: Response) => {
   try {
-    const cars = await Car.find().sort({ createdAt: -1 });
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 3;
+    let offset = (page - 1) * limit;
+
+    console.log({ page, limit, offset });
+    const cars = await Car.find()
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit);
     res.json({
       status: "success",
       data: cars,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "error",
+      error: error.message,
+    });
+  }
+};
+
+export const getTotalCount = async (req: Request, res: Response) => {
+  try {
+    const count = await Car.find().countDocuments();
+    res.json({
+      status: "success",
+      data: count,
     });
   } catch (error) {
     res.status(404).json({
@@ -91,9 +114,28 @@ export const getModels = async (req: Request, res: Response) => {
     const car = await Car.find({
       name,
     }).select("model name");
+
+    let obj: any = {};
+    car.forEach((v: any) => {
+      if (obj[v.model]) {
+        obj[v.model] += 1;
+      } else {
+        obj[v.model] = 1;
+      }
+    });
+
+    let key = Object.keys(obj);
+    let value = Object.values(obj);
+
+    let data: any[] = [];
+
+    for (let v in key) {
+      data.push({ model: key[v], count: value[v] });
+    }
+
     res.json({
       status: "success",
-      data: car,
+      data,
     });
   } catch (error) {
     res.status(404).json({

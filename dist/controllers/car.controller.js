@@ -21,10 +21,32 @@ cloudinary_1.v2.config({
 });
 exports.getCars = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const cars = yield Car_model_1.default.find().sort({ createdAt: -1 });
+        let page = Number(req.query.page) || 1;
+        let limit = Number(req.query.limit) || 3;
+        let offset = (page - 1) * limit;
+        console.log({ page, limit, offset });
+        const cars = yield Car_model_1.default.find()
+            .sort({ createdAt: -1 })
+            .skip(offset)
+            .limit(limit);
         res.json({
             status: "success",
             data: cars,
+        });
+    }
+    catch (error) {
+        res.status(404).json({
+            status: "error",
+            error: error.message,
+        });
+    }
+});
+exports.getTotalCount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const count = yield Car_model_1.default.find().countDocuments();
+        res.json({
+            status: "success",
+            data: count,
         });
     }
     catch (error) {
@@ -85,9 +107,24 @@ exports.getModels = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const car = yield Car_model_1.default.find({
             name,
         }).select("model name");
+        let obj = {};
+        car.forEach((v) => {
+            if (obj[v.model]) {
+                obj[v.model] += 1;
+            }
+            else {
+                obj[v.model] = 1;
+            }
+        });
+        let key = Object.keys(obj);
+        let value = Object.values(obj);
+        let data = [];
+        for (let v in key) {
+            data.push({ model: key[v], count: value[v] });
+        }
         res.json({
             status: "success",
-            data: car,
+            data,
         });
     }
     catch (error) {
