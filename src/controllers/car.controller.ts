@@ -257,28 +257,31 @@ export const filterByAll = async (req: Request, res: Response) => {
 
 export const createCar = async (req: any, res: Response) => {
   try {
-    const files = req.files;
+    const files = req.files.file;
+    console.log(files);
     let imgArray: any = [];
-    if (files) {
-      for (let i = 0; i < files.length; i++) {
-        const img = await uploadImage(files[i]);
-        img.push(img.secure_url);
-      }
-      console.log({ imgArray });
-      const car = new Car({ ...req.body, photo_url: JSON.stringify(imgArray) });
-      await car.save();
-      res.json({
-        status: "success",
-        data: car,
-      });
-    } else {
-      const car = new Car(req.body);
-      await car.save();
-      res.json({
-        status: "success",
-        data: car,
-      });
+    // if (files) {
+
+    // }
+    for (let i = 0; i < files.length; i++) {
+      const img = await uploadImage(files[i]);
+      imgArray.push(img.secure_url);
     }
+    console.log({ imgArray });
+    const car = new Car({ ...req.body, photo_url: JSON.stringify(imgArray) });
+    await car.save();
+    res.json({
+      status: "success",
+      data: car,
+    });
+    // else {
+    //   const car = new Car(req.body);
+    //   await car.save();
+    //   res.json({
+    //     status: "success",
+    //     data: car,
+    //   });
+    // }
   } catch (error) {
     console.log(error.message.split(":"));
     res.status(404).json({
@@ -295,7 +298,7 @@ export const createCar = async (req: any, res: Response) => {
 
 export const deleteCar = async (req: any, res: any) => {
   try {
-    await Car.findByIdAndDelete(req.params.id);
+    await Car.remove({});
     res.json({ status: "success" });
   } catch (error) {}
 };

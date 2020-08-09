@@ -236,29 +236,30 @@ exports.filterByAll = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.createCar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const files = req.files;
+        const files = req.files.file;
+        console.log(files);
         let imgArray = [];
-        if (files) {
-            for (let i = 0; i < files.length; i++) {
-                const img = yield uploadImage_1.uploadImage(files[i]);
-                img.push(img.secure_url);
-            }
-            console.log({ imgArray });
-            const car = new Car_model_1.default(Object.assign(Object.assign({}, req.body), { photo_url: JSON.stringify(imgArray) }));
-            yield car.save();
-            res.json({
-                status: "success",
-                data: car,
-            });
+        // if (files) {
+        // }
+        for (let i = 0; i < files.length; i++) {
+            const img = yield uploadImage_1.uploadImage(files[i]);
+            imgArray.push(img.secure_url);
         }
-        else {
-            const car = new Car_model_1.default(req.body);
-            yield car.save();
-            res.json({
-                status: "success",
-                data: car,
-            });
-        }
+        console.log({ imgArray });
+        const car = new Car_model_1.default(Object.assign(Object.assign({}, req.body), { photo_url: JSON.stringify(imgArray) }));
+        yield car.save();
+        res.json({
+            status: "success",
+            data: car,
+        });
+        // else {
+        //   const car = new Car(req.body);
+        //   await car.save();
+        //   res.json({
+        //     status: "success",
+        //     data: car,
+        //   });
+        // }
     }
     catch (error) {
         console.log(error.message.split(":"));
@@ -275,7 +276,7 @@ exports.createCar = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.deleteCar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield Car_model_1.default.findByIdAndDelete(req.params.id);
+        yield Car_model_1.default.remove({});
         res.json({ status: "success" });
     }
     catch (error) { }

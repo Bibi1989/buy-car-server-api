@@ -8,7 +8,7 @@ v2.config({
 
 export const uploadImage = async (file: any) => {
   const img = await v2.uploader.upload(
-    file.file.tempFilePath,
+    file.tempFilePath,
     { folder: "buycar" },
     (err: Error, result: any) => {
       if (err) {

@@ -14,6 +14,6 @@ router.route("/prices").get(car_controller_1.filterByPrice);
 router.route("/prices/all").get(car_controller_1.filterByAll);
 router.route("/models/:model").get(car_controller_1.getModels);
 router.route("/cars").post(car_controller_1.createCar);
-router.route("/cars/:id").delete(car_controller_1.deleteCar);
+router.route("/cars").delete(car_controller_1.deleteCar);
 exports.default = router;
 //# sourceMappingURL=car.route.js.map

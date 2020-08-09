@@ -27,6 +27,6 @@ router.route("/prices").get(filterByPrice);
 router.route("/prices/all").get(filterByAll);
 router.route("/models/:model").get(getModels);
 router.route("/cars").post(createCar);
-router.route("/cars/:id").delete(deleteCar);
+router.route("/cars").delete(deleteCar);
 
 export default router;

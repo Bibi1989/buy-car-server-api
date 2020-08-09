@@ -16,7 +16,7 @@ cloudinary_1.v2.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 exports.uploadImage = (file) => __awaiter(void 0, void 0, void 0, function* () {
-    const img = yield cloudinary_1.v2.uploader.upload(file.file.tempFilePath, { folder: "buycar" }, (err, result) => {
+    const img = yield cloudinary_1.v2.uploader.upload(file.tempFilePath, { folder: "buycar" }, (err, result) => {
         if (err) {
             console.log(err);
         }
