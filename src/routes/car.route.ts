@@ -10,6 +10,7 @@ import {
   getCarBaseOnMakeAndModel,
   filterByPrice,
   getTotalCount,
+  filterByAll,
 } from "../controllers/car.controller";
 
 const router = Router();
@@ -22,6 +23,7 @@ router.route("/cars/location/:location").get(getCarBaseOnLocation);
 router.route("/count").get(getTotalCount);
 router.route("/makes").get(getMakes);
 router.route("/prices").get(filterByPrice);
+router.route("/prices/all").get(filterByAll);
 router.route("/models/:model").get(getModels);
 router.route("/cars").post(createCar);
 

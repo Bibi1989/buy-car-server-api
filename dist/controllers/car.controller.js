@@ -22,9 +22,8 @@ cloudinary_1.v2.config({
 exports.getCars = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let page = Number(req.query.page) || 1;
-        let limit = Number(req.query.limit) || 3;
+        let limit = Number(req.query.limit) || 4;
         let offset = (page - 1) * limit;
-        console.log({ page, limit, offset });
         const cars = yield Car_model_1.default.find()
             .sort({ createdAt: -1 })
             .skip(offset)
@@ -211,6 +210,29 @@ exports.filterByPrice = (req, res) => __awaiter(void 0, void 0, void 0, function
         });
     }
 });
+exports.filterByAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let min = req.query.min;
+        let max = req.query.max;
+        let make = req.query.make;
+        let model = req.query.model;
+        const price = yield Car_model_1.default.find({
+            make,
+            model,
+        });
+        let data = price.filter((p) => Number(p.price) >= Number(min) && Number(p.price) <= Number(max));
+        res.json({
+            status: "success",
+            data,
+        });
+    }
+    catch (error) {
+        res.status(404).json({
+            status: "error",
+            error: error.message,
+        });
+    }
+});
 exports.createCar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const file = req.files;
@@ -239,9 +261,15 @@ exports.createCar = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }
     catch (error) {
+        console.log(error.message.split(":"));
         res.status(404).json({
             status: "error",
-            error: error.message,
+            error: error.message
+                .split(":")
+                .slice(2)
+                .map((e) => ({
+                [e.trim().split(" ")[0]]: e.trim().split(",")[0],
+            })),
         });
     }
 });

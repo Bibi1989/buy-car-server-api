@@ -21,7 +21,7 @@ const CarSchema = new mongoose_1.default.Schema({
     distance: String,
     fuel_type: {
         type: String,
-        required: [true, "Petrol is a required field"],
+        required: [true, "Fuel Type is a required field"],
     },
     photo_url: String,
     color: String,

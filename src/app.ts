@@ -49,7 +49,7 @@ app.use(function (
 
   // render the error page
   res.status(err.status || 500);
-  res.json({ error: "Something went wrong" });
+  res.json({ status: "error", error: "Something went wrong" });
 });
 
 export default app;

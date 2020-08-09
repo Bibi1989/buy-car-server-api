@@ -27,10 +27,9 @@ interface CarInterface {
 export const getCars = async (req: Request, res: Response) => {
   try {
     let page = Number(req.query.page) || 1;
-    let limit = Number(req.query.limit) || 3;
+    let limit = Number(req.query.limit) || 4;
     let offset = (page - 1) * limit;
 
-    console.log({ page, limit, offset });
     const cars = await Car.find()
       .sort({ createdAt: -1 })
       .skip(offset)
@@ -226,6 +225,35 @@ export const filterByPrice = async (req: Request, res: Response) => {
   }
 };
 
+export const filterByAll = async (req: Request, res: Response) => {
+  try {
+    let min = req.query.min;
+    let max = req.query.max;
+    let make = req.query.make;
+    let model = req.query.model;
+
+    const price = await Car.find({
+      make,
+      model,
+    });
+
+    let data = price.filter(
+      (p: any) =>
+        Number(p.price) >= Number(min) && Number(p.price) <= Number(max)
+    );
+
+    res.json({
+      status: "success",
+      data,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "error",
+      error: error.message,
+    });
+  }
+};
+
 export const createCar = async (req: any, res: Response) => {
   try {
     const file = req.files;
@@ -257,9 +285,15 @@ export const createCar = async (req: any, res: Response) => {
       });
     }
   } catch (error) {
+    console.log(error.message.split(":"));
     res.status(404).json({
       status: "error",
-      error: error.message,
+      error: error.message
+        .split(":")
+        .slice(2)
+        .map((e: string) => ({
+          [e.trim().split(" ")[0]]: e.trim().split(",")[0],
+        })),
     });
   }
 };
