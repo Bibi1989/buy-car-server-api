@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const cloudinary_1 = require("cloudinary");
 const Car_model_1 = __importDefault(require("../models/Car.model"));
+const uploadImage_1 = require("../utils/uploadImage");
 cloudinary_1.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -235,16 +236,15 @@ exports.filterByAll = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.createCar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const file = req.files;
-        if (file) {
-            const img = yield cloudinary_1.v2.uploader.upload(file.file.tempFilePath, { folder: "buycar" }, (err, result) => {
-                if (err) {
-                    console.log(err);
-                }
-                return result;
-            });
-            const car = new Car_model_1.default(Object.assign(Object.assign({}, req.body), { photo_url: img.secure_url }));
-            yield car.save();
+        const files = req.files;
+        let imgArray = [];
+        if (files) {
+            for (let i = 0; i < files.length; i++) {
+                const img = yield uploadImage_1.uploadImage(files[i]);
+                img.push(img.secure_url);
+            }
+            console.log({ imgArray });
+            const car = new Car_model_1.default(Object.assign(Object.assign({}, req.body), { photo_url: JSON.stringify(imgArray) }));
             yield car.save();
             res.json({
                 status: "success",
@@ -272,5 +272,12 @@ exports.createCar = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             })),
         });
     }
+});
+exports.deleteCar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield Car_model_1.default.findByIdAndDelete(req.params.id);
+        res.json({ status: "success" });
+    }
+    catch (error) { }
 });
 //# sourceMappingURL=car.controller.js.map

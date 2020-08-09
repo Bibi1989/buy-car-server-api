@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { v2 } from "cloudinary";
 
 import Car from "../models/Car.model";
+import { uploadImage } from "../utils/uploadImage";
 
 v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -256,21 +257,15 @@ export const filterByAll = async (req: Request, res: Response) => {
 
 export const createCar = async (req: any, res: Response) => {
   try {
-    const file = req.files;
-    if (file) {
-      const img = await v2.uploader.upload(
-        file.file.tempFilePath,
-        { folder: "buycar" },
-        (err: Error, result: any) => {
-          if (err) {
-            console.log(err);
-          }
-          return result;
-        }
-      );
-      const car = new Car({ ...req.body, photo_url: img.secure_url });
-      await car.save();
-
+    const files = req.files;
+    let imgArray: any = [];
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const img = await uploadImage(files[i]);
+        img.push(img.secure_url);
+      }
+      console.log({ imgArray });
+      const car = new Car({ ...req.body, photo_url: JSON.stringify(imgArray) });
       await car.save();
       res.json({
         status: "success",
@@ -296,4 +291,11 @@ export const createCar = async (req: any, res: Response) => {
         })),
     });
   }
+};
+
+export const deleteCar = async (req: any, res: any) => {
+  try {
+    await Car.findByIdAndDelete(req.params.id);
+    res.json({ status: "success" });
+  } catch (error) {}
 };

@@ -8,22 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-exports.connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield mongoose_1.default.connect(process.env.MONGO_URI, {
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-            useNewUrlParser: true,
-        });
-        console.log("connected to db!!!");
-    }
-    catch (error) {
-        console.log("error connecting to db!!!");
-    }
+const cloudinary_1 = require("cloudinary");
+cloudinary_1.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-//# sourceMappingURL=dbConnect.js.map
+exports.uploadImage = (file) => __awaiter(void 0, void 0, void 0, function* () {
+    const img = yield cloudinary_1.v2.uploader.upload(file.file.tempFilePath, { folder: "buycar" }, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        return result;
+    });
+    return img;
+});
+//# sourceMappingURL=uploadImage.js.map
